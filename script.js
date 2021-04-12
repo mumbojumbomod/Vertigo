@@ -46,7 +46,7 @@ window.onload = function () {
     type: Phaser.AUTO,
     width: 1334,
     height: 750,
-    scene: [Morrow, preloadGame, playGame, Ded],
+    scene: [Morrow, preloadGame, playGame, Ded, Win, doodoo],
     backgroundColor: 0x0c88c7,
 
     // physics settings
@@ -54,7 +54,7 @@ window.onload = function () {
       default: "arcade",
       arcade: {
         enableBody: true,
-        debug: true,
+        debug: false,
 
       }
     }
@@ -73,6 +73,7 @@ class Morrow extends Phaser.Scene {
     this.load.image('O', 'CATACLYSM.png');
     this.load.image("Pembrose", "pembrosetriangle.png");
     this.load.image("briks", "pixil-frame-0-11 copy 4.png");
+    this.load.image("info", "info.png");
     this.load.audio('music', ['cytadel.mp3', 'cytadel.ogg'])
   }//\n
 
@@ -100,6 +101,13 @@ class Morrow extends Phaser.Scene {
     }
     gameState.music = this.sound.add('music', musicConfig);
     gameState.music.play();
+    gameState.arkhalis = this.add.rectangle(50, 50, 50, 50, 0x03fc45);
+    gameState.arkhalis.setInteractive();
+    this.add.sprite(50, 50, 'info').setScale(0.6)
+    gameState.arkhalis.on('pointerdown', () => {
+      this.scene.stop('Morrow');
+      this.scene.start('doodoo');
+    });
   }
 
 
@@ -314,7 +322,7 @@ class playGame extends Phaser.Scene {
     this.physics.add.overlap(gameState.player, gameState.jeff, function (player, coin) {
       this.scene.stop('playGame')
 
-      this.scene.start('Morrow')
+      this.scene.start('Win')
     }, null, this);
 
     gameState.jeff.body.setSize(gameState.jeff.width - 80, gameState.jeff.height - 50).setOffset(40, 50);
@@ -436,7 +444,7 @@ class playGame extends Phaser.Scene {
     }
   }
   update() {
-    if (gameState.distance === 10) {
+    if (gameState.distance === 15) {
       gameState.jeff.setVelocityX(-200)
     }
     gameState.coinscountlog.setText(`Distance Travled : ${gameState.distance} miles`)
@@ -549,5 +557,50 @@ class Ded extends Phaser.Scene {
       this.scene.start('PreloadGame')
     });
 
+  }
+
+}
+class Win extends Phaser.Scene {
+  constructor() {
+    super("Win");
+  }
+  preload() {
+    this.load.image("briks", "pixil-frame-0-11 copy 4.png");
+  }//\n
+
+  create() {
+    gameState.briks = this.add.sprite(1050, 510, 'briks').setScale(4.5)
+    this.add.text(0, 50, "You escaped the\n   vertigo", { fontSize: '150px', fill: '#ffc800' });
+    this.add.text(100, 400, "Take a screenshot for full\n    bragging rights!", { fontSize: '70px', fill: '#ffc800' });
+    this.add.text(200, 600, 'Click to go again', { fontSize: '90px', fill: '#ffc800' });
+    this.input.on('pointerup', () => {
+      // Add your code below:
+      this.scene.stop('Win')
+      this.scene.start('Morrow')
+    });
+
+  }
+}
+class doodoo extends Phaser.Scene {
+  constructor() {
+    super("doodoo");
+  }
+  preload() {
+    this.load.image("briks", "pixil-frame-0-11 copy 4.png");
+    this.load.image("house", "house.png");
+
+  }//\n
+
+  create() {
+    gameState.briks = this.add.sprite(1050, 510, 'briks').setScale(4.5)
+    this.add.text(0, 50, "Try to escape from the vertigo\ncollect reversals to prevent the\nworld from going dark.\nfind the portal and escape!\nclick to jump.", { fontSize: '70px', fill: '#ffc800' });
+    this.add.text(20, 600, 'Click the button to go to game', { fontSize: '70px', fill: '#ffc800' });
+    gameState.arkhalis = this.add.rectangle(50, 35, 50, 50, 0x03fc45);
+    gameState.arkhalis.setInteractive();
+    this.add.sprite(50, 35, 'house').setScale(0.6)
+    gameState.arkhalis.on('pointerdown', () => {
+      this.scene.stop('doodoo')
+      this.scene.start('Morrow')
+    });
   }
 }

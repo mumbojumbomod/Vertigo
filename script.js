@@ -444,7 +444,7 @@ class playGame extends Phaser.Scene {
     }
   }
   update() {
-    if (gameState.distance === 15) {
+    if (gameState.distance === 10) {
       gameState.jeff.setVelocityX(-200)
     }
     gameState.coinscountlog.setText(`Distance Travled : ${gameState.distance} miles`)
@@ -573,13 +573,19 @@ class Win extends Phaser.Scene {
     this.add.text(0, 50, "You escaped the\n   vertigo", { fontSize: '150px', fill: '#ffc800' });
     this.add.text(100, 400, "Take a screenshot for full\n    bragging rights!", { fontSize: '70px', fill: '#ffc800' });
     this.add.text(200, 600, 'Click to go again', { fontSize: '90px', fill: '#ffc800' });
-    this.input.on('pointerup', () => {
-      // Add your code below:
-      this.scene.stop('Win')
-      this.scene.start('Morrow')
-    });
-
+    let timer = gameState.this.time.addEvent({
+      delay: 3000,
+      callback: () => {
+        this.input.on('pointerup', () => {
+          // Add your code below:
+          this.scene.stop('Win')
+          this.scene.start('Morrow')
+        });
+      }
+    })
   }
+
+
 }
 class doodoo extends Phaser.Scene {
   constructor() {
